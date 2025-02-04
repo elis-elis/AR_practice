@@ -24,8 +24,8 @@ import numpy as np
 # Initialize the MediaPipe Hands module
 mp_hands = mp.solutions.hands  # Load the hand-tracking solution from MediaPipe
 hands = mp_hands.Hands(
-    min_detection_confidence=0.7,
-    min_tracking_confidence=0.7
+    min_detection_confidence=0.8,
+    min_tracking_confidence=0.8
 )
 mp_draw = mp.solutions.drawing_utils
 
@@ -72,17 +72,24 @@ while cap.isOpened():
             mx, my = int(hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x * w), \
                      int(hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
 
+            # Calculate distance between index and middle fingers
+            distance = np.sqrt((cx - mx) ** 2 + (cy - my) ** 2)
+
             # Draw a circle at the index finger tip (Green)
             cv2.circle(frame, (cx, cy), 10, (0, 255, 0), -1)
 
-            # Draw a circle at the middle finger tip (Red)
-            cv2.circle(frame, (mx, my), 10, (0, 0, 255), -1)
+            # Draw a circle at the middle finger tip (Pink)
+            cv2.circle(frame, (mx, my), 10, (255, 182, 193), -1)
 
-            # If the previous position exists, draw a line
-            if prev_x is not None and prev_y is not None:
-                cv2.line(canvas, (prev_x, prev_y), (cx, cy), (255, 0, 0), 5)
+            # If the distance is small, erase instead of drawing
+            if distance < 40:  # Threshold for eraser mode
+                cv2.circle(canvas, (cx, cy), 20, (0, 0, 0), -1)  # Erase with balck
+            else:
+                # If the previous position exists, draw a line
+                if prev_x is not None and prev_y is not None:
+                    cv2.line(canvas, (prev_x, prev_y), (cx, cy), (255, 0, 0), 5)
             
-            prev_x, prev_y = cx, cy  # Update position
+            prev_x, prev_y = cx, cy  # Update previous position
 
             # Draw hand landmarks
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
