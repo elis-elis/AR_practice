@@ -34,13 +34,13 @@ mp_draw = mp.solutions.drawing_utils
 cap = cv2.VideoCapture(0)
 
 # Create a blank canvas for drawing
-canvas = np.zeros((480, 630, 3), dtype=np.unit8)
+canvas = np.zeros((480, 640, 3), dtype=np.uint8)  # standard webcam width
 
 # Previous finger position
 prev_x, prev_y = None, None
 
 # Start an infinite loop to continuously capture video frames from the webcam
-while cap.isOpened:
+while cap.isOpened():
     # Read a single frame from the webcam
     # `success` is a boolean indicating success; `frame` is the captured frame.
     success, frame = cap.read()
@@ -52,10 +52,8 @@ while cap.isOpened:
 
     # Flip the frame horizontally (like a mirror image)
     frame = cv2.flip(frame, 1)
-
     # Convert the frame from BGR (OpenCV default) to RGB (MediaPipe requirement)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
     # Process the RGB frame to detect and track hands
     result = hands.process(rgb_frame)
 
@@ -67,14 +65,24 @@ while cap.isOpened:
             index_finger_tip = hand_landmarks.landmark[8]
             # Get the frame dimensions (height and width)
             h, w, _ = frame.shape
-            x, y = int(index_finger_tip.x * w), int(index_finger_tip.y * h)
+            # Get index and middle finger tip positions
+            cx, cy = int(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * w), \
+                     int(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y * h)
 
-            if prev_x is None or prev_y is None:
-                prev_x, prev_y = x, y
+            mx, my = int(hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x * w), \
+                     int(hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
 
-            # Draw on the canvas
-            cv2.line(canvas, (prev_x, prev_y), (x, y), (255, 0,0), 5)
-            prev_x, prev_y = x, y
+            # Draw a circle at the index finger tip (Green)
+            cv2.circle(frame, (cx, cy), 10, (0, 255, 0), -1)
+
+            # Draw a circle at the middle finger tip (Red)
+            cv2.circle(frame, (mx, my), 10, (0, 0, 255), -1)
+
+            # If the previous position exists, draw a line
+            if prev_x is not None and prev_y is not None:
+                cv2.line(canvas, (prev_x, prev_y), (cx, cy), (255, 0, 0), 5)
+            
+            prev_x, prev_y = cx, cy  # Update position
 
             # Draw hand landmarks
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
@@ -104,4 +112,4 @@ while cap.isOpened:
 cap.release()
 
 # Close all OpenCV-created windows
-cv2.destroyAllWindows
+cv2.destroyAllWindows()
