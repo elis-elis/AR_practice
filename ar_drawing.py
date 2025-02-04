@@ -29,12 +29,18 @@ hands = mp_hands.Hands(
 )
 mp_draw = mp.solutions.drawing_utils
 
+for i in range(3):
+    cap = cv2.VideoCapture(i)
+    if cap.isOpened():
+        print(f"Capera index {i} is available")
+        cap.release()
+
 # Open webcam
 # The argument '0' specifies the default camera (usually the built-in webcam).
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
 
-# Create a blank canvas for drawing
-canvas = np.zeros((480, 640, 3), dtype=np.uint8)  # standard webcam width
+# Create a blank canvas that matches the frame size
+canvas = None
 
 # Previous finger position
 prev_x, prev_y = None, None
@@ -93,6 +99,10 @@ while cap.isOpened():
 
             # Draw hand landmarks
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+    # Ensure canvas has the same shape as frame, and created only once and resized if needed.
+    if canvas is None or canvas.shape != frame.shape:
+        canvas = np.zeros_like(frame)
 
     # Merge canvas with frame
     frame = cv2.addWeighted(frame, 0.5, canvas, 0.5, 0)
