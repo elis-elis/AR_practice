@@ -11,7 +11,6 @@ Uses Mediapipe's Hand Tracking to detect hands in real-time.
 Draws hand landmarks and connections on the screen.
 Closes the webcam if you press 'q'.
 Flipping the video – Makes it behave like a mirror.
-Tracking the index finger tip (landmark 8).
 Drawing on a separate canvas – Prevents the drawing from being erased when the frame updates.
 Using cv2.line() – Connects the previous finger position to the new one, simulating drawing.
 Merging the drawing with the webcam feed – Makes it look like AR.
@@ -92,7 +91,7 @@ while cap.isOpened():
             cv2.circle(frame, (mx, my), 10, (255, 182, 193), -1)  # Middle finger (Pink)
 
             # If the distance is small, erase instead of drawing
-            if distance < 30:  # Threshold for eraser mode
+            if distance < 40:  # Threshold for eraser mode
                 cv2.circle(canvas, (cx, cy), 30, (0, 0, 0), -1)  # Erase with black
                 cv2.blur(canvas, (20, 20))
             else:
