@@ -1,3 +1,7 @@
 # AR_practice
-trying out Augmented Reality stuffs
-to build an AR Drawing App using OpenCV and Mediapipe in Python
+
+building an AR Drawing App using OpenCV and Mediapipe in Python
+
+- Capture Webcam Feed
+- Integrate Hand Detection
+- Track Finger Position and Draw

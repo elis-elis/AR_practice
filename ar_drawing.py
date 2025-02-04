@@ -3,9 +3,23 @@ NumPy – for numerical operations (e.g., working with arrays, images, and point
 OpenCV-Contrib-Python – contains additional OpenCV modules that may be useful later.
 Matplotlib – useful for debugging and visualization.
 """
+"""
+this code:
+Opens the webcam using OpenCV.
+Converts frames from BGR to RGB (because Mediapipe requires RGB).
+Uses Mediapipe's Hand Tracking to detect hands in real-time.
+Draws hand landmarks and connections on the screen.
+Closes the webcam if you press 'q'.
+Flipping the video – Makes it behave like a mirror.
+Tracking the index finger tip (landmark 8).
+Drawing on a separate canvas – Prevents the drawing from being erased when the frame updates.
+Using cv2.line() – Connects the previous finger position to the new one, simulating drawing.
+Merging the drawing with the webcam feed – Makes it look like AR.
+"""
 
 import cv2
 import mediapipe as mp
+import numpy as np
 
 # Initialize the MediaPipe Hands module
 mp_hands = mp.solutions.hands  # Load the hand-tracking solution from MediaPipe
@@ -18,6 +32,12 @@ mp_draw = mp.solutions.drawing_utils
 # Open webcam
 # The argument '0' specifies the default camera (usually the built-in webcam).
 cap = cv2.VideoCapture(0)
+
+# Create a blank canvas for drawing
+canvas = np.zeros((480, 630, 3), dtype=np.unit8)
+
+# Previous finger position
+prev_x, prev_y = None, None
 
 # Start an infinite loop to continuously capture video frames from the webcam
 while cap.isOpened:
@@ -43,18 +63,35 @@ while cap.isOpened:
     if result.multi_hand_landmarks:
         # Iterate through all detected hands
         for hand_landmarks in result.multi_hand_landmarks:
+            # Get index finger tip position (landmark 8)
+            index_finger_tip = hand_landmarks.landmark[8]
+            # Get the frame dimensions (height and width)
+            h, w, _ = frame.shape
+            x, y = int(index_finger_tip.x * w), int(index_finger_tip.y * h)
+
+            if prev_x is None or prev_y is None:
+                prev_x, prev_y = x, y
+
+            # Draw on the canvas
+            cv2.line(canvas, (prev_x, prev_y), (x, y), (255, 0,0), 5)
+            prev_x, prev_y = x, y
+
+            # Draw hand landmarks
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
+    # Merge canvas with frame
+    frame = cv2.addWeighted(frame, 0.5, canvas, 0.5, 0)
 
-            # Calculate the pixel coordinates of the tip of the index finger
-
-
-    # Display the current frame in a window named 'Hand Tracking'
-    cv2.imshow('Hand Tracking', frame)
+    # Display the current frame in a window named 'AR Drawing'
+    cv2.imshow('AR Drawing', frame)
 
     # Wait for a key press for 1 millisecond
+    # Clear screen when 'c' is pressed
     # If the 'q' key is pressed, break the loop to stop the video feed.
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1) & 0xFF 
+    if key == ord('c'):
+        canvas[:] = 0
+    elif key == ord('q'):
         break
     """
     When using cv2.waitKey() in OpenCV, the returned key code may include extra bits depending 
