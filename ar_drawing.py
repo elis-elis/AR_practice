@@ -35,15 +35,16 @@ for i in range(3):
         print(f"Capera index {i} is available")
         cap.release()
 
-# Open webcam
-# The argument '0' specifies the default camera (usually the built-in webcam).
+# Open webcam (Try different indexes if needed)
+# The argument '2' specifies the default camera (the built-in webcam).
 cap = cv2.VideoCapture(2)
 
 # Create a blank canvas that matches the frame size
 canvas = None
 
-# Previous finger position
+# Previous finger positions
 prev_x, prev_y = None, None
+prev_mx, prev_my = None, None  # Track middle finger position
 
 # Start an infinite loop to continuously capture video frames from the webcam
 while cap.isOpened():
@@ -63,6 +64,10 @@ while cap.isOpened():
     # Process the RGB frame to detect and track hands
     result = hands.process(rgb_frame)
 
+    # Ensure canvas has the same shape as frame, and created only once and resized if needed.
+    if canvas is None or canvas.shape != frame.shape:
+        canvas = np.zeros_like(frame)
+
     # If hands are detected in the frame
     if result.multi_hand_landmarks:
         # Iterate through all detected hands
@@ -71,38 +76,40 @@ while cap.isOpened():
             index_finger_tip = hand_landmarks.landmark[8]
             # Get the frame dimensions (height and width)
             h, w, _ = frame.shape
-            # Get index and middle finger tip positions
+
+            # Get Index Finger Position
             cx, cy = int(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * w), \
                      int(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y * h)
-
+            # Get Middle Finger Position
             mx, my = int(hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x * w), \
                      int(hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
 
-            # Calculate distance between index and middle fingers
+            # Calculate distance between index and middle fingers (for erasing)
             distance = np.sqrt((cx - mx) ** 2 + (cy - my) ** 2)
 
-            # Draw a circle at the index finger tip (Green)
-            cv2.circle(frame, (cx, cy), 10, (0, 255, 0), -1)
-
-            # Draw a circle at the middle finger tip (Pink)
-            cv2.circle(frame, (mx, my), 10, (255, 182, 193), -1)
+            # Draw fingertip circles
+            cv2.circle(frame, (cx, cy), 10, (0, 255, 0), -1)  # Index finger (Green)
+            cv2.circle(frame, (mx, my), 10, (255, 182, 193), -1)  # Middle finger (Pink)
 
             # If the distance is small, erase instead of drawing
-            if distance < 40:  # Threshold for eraser mode
-                cv2.circle(canvas, (cx, cy), 20, (0, 0, 0), -1)  # Erase with balck
+            if distance < 30:  # Threshold for eraser mode
+                cv2.circle(canvas, (cx, cy), 30, (0, 0, 0), -1)  # Erase with black
+                cv2.blur(canvas, (20, 20))
             else:
-                # If the previous position exists, draw a line
-                if prev_x is not None and prev_y is not None:
-                    cv2.line(canvas, (prev_x, prev_y), (cx, cy), (255, 0, 0), 5)
-            
-            prev_x, prev_y = cx, cy  # Update previous position
+                if cy < my:  # If index finger is higher, draw with index finger (green)
+                    if prev_x is not None and prev_y is not None:
+                        cv2.line(canvas, (prev_x, prev_y), (cx, cy), (0, 255, 0), 5)
+                    prev_x, prev_y = cx, cy
+                    prev_mx, prev_my = None, None  # Reset middle finger tracking
+                
+                elif my < cy:  # If middle finger is higher, draw with middle finger (pink)
+                    if prev_mx is not None and prev_my is not None:
+                        cv2.line(canvas, (prev_mx, prev_my), (mx, my), (255, 182, 193), 5)
+                    prev_mx, prev_my = mx, my
+                    prev_x, prev_y = None, None  # Reset index finger tracking
 
             # Draw hand landmarks
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-    # Ensure canvas has the same shape as frame, and created only once and resized if needed.
-    if canvas is None or canvas.shape != frame.shape:
-        canvas = np.zeros_like(frame)
 
     # Merge canvas with frame
     frame = cv2.addWeighted(frame, 0.5, canvas, 0.5, 0)
@@ -110,7 +117,6 @@ while cap.isOpened():
     # Display the current frame in a window named 'AR Drawing'
     cv2.imshow('AR Drawing', frame)
 
-    # Wait for a key press for 1 millisecond
     # Clear screen when 'c' is pressed
     # If the 'q' key is pressed, break the loop to stop the video feed.
     key = cv2.waitKey(1) & 0xFF 
