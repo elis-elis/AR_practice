@@ -8,6 +8,8 @@ Handles all drawing operations, including:
 
 import cv2
 import numpy as np
+from modules.utils import calculate_distance
+
 
 class DrawingCanvas:
     """
@@ -37,15 +39,23 @@ class DrawingCanvas:
         """
         cv2.line(self.canvas, start, end, color, thickness)
 
-    def erase(self, position, size=20):
+    def erase(self, index_finger, middle_finger, erase_threshold=50, size=30):
         """
-        Erases part of the canvas by drawing a black circle.
+        Erases part of the canvas when index and middle fingers are close together.
 
         Args:
-            position (tuple): Center of the eraser (x, y).
+            index_finger (tuple): Coordinates (x, y) of the index finger tip.
+            middle_finger (tuple): Coordinates (x, y) of the middle finger tip.
+            erase_threshold (int): Maximum distance between fingers to trigger erase.
             size (int): Radius of the eraser.
         """
-        cv2.circle(self.canvas, position, size, (0, 0, 0), -1)
+        if index_finger and middle_finger:
+            distance = calculate_distance(index_finger, middle_finger)
+
+            if distance < erase_threshold:  # If fingers are close enough, erase
+                cv2.circle(self.canvas, index_finger, size, (0, 0, 0), -1)
+                cv2.circle(self.canvas, middle_finger, size, (0, 0, 0), -1)
+                cv2.blur(self.canvas, (15, 15))  # Optional: Smooth out erased area
     
     def merge_with_frame(self, frame):
         """
