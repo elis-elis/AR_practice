@@ -12,7 +12,7 @@ from modules.drawing import DrawingCanvas
 from modules.utils import calculate_distance
 
 # Initialize modules
-cap = cv2.VideoCapture(2)  # Open webcam
+cap = cv2.VideoCapture(1)  # Open webcam
 tracker = HandTracker()  # Hand tracking module
 canvas = None  # Drawing canvas (initialized later)
 prev_index = None  # Store previous index finger position
@@ -34,12 +34,12 @@ while cap.isOpened():
         for hand_landmarks in result.multi_hand_landmarks:
             index_finger, middle_finger = tracker.get_finger_positions(hand_landmarks, frame.shape)
 
-            if index_finger:
-                tracker.draw_landmarks(frame, hand_landmarks)
+            if index_finger and middle_finger:  # Ensure both fingers are detected
+                distance = calculate_distance(index_finger, middle_finger)  # Calculate distance
 
                 # Erase if index & middle fingers are close together
-                if middle_finger and calculate_distance(index_finger, middle_finger) < 40:
-                    canvas.erase(index_finger, size=30)
+                if distance < 40:
+                    canvas.erase(index_finger, middle_finger, size=30)
                 else:
                     # Draw with index finger
                     if prev_index:
