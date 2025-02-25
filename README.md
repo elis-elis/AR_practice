@@ -1,6 +1,6 @@
 # AR_practice 🎨🖐️
 
-![Screenshot_ar_drawing.png](Screenshot_ar_drawing.png)
+![Screenshot](modules/assets/Screenshot_ar_drawing.png)
 
 An Augmented Reality (AR) Drawing App built with OpenCV and MediaPipe in Python. This project enables real-time hand tracking to draw on a virtual canvas using your index or middle finger, with an eraser mode when both fingers are close together.
 
@@ -45,40 +45,17 @@ An Augmented Reality (AR) Drawing App built with OpenCV and MediaPipe in Python.
 
 ----
 
-Next Steps :
+```md
+## 🚀 Future Enhancements  
 
-🎨 1. Color Selection
+### 🎨 1. Color Selection  
+- **Hand Gestures:** Show three fingers to cycle through colors, thumbs-up to confirm.  
+- **Keyboard Shortcuts:** 'R' for Red, 'G' for Green, 'B' for Blue, etc.  
+- **On-Screen Palette:** Hover over a virtual palette to select a color.  
 
-Right now, the colors are fixed (green for index, pink for middle). We can make this more interactive by letting users choose colors dynamically.
-
-Ways to Implement Color Selection:
-
-✅ Hand Gestures:
-
-Show three fingers (e.g., index + middle + ring) to cycle through colors.
-
-A thumbs-up gesture to confirm a color.
-
-✅ Keyboard Shortcuts:
-
-Press 'R' for Red, 'G' for Green, 'B' for Blue, etc.
-
-✅ On-Screen Palette:
-
-Display a small color palette overlay, where users can hover their finger over a color to select it.
-
-🖐️ 2. Gesture-Based UI
-
-Instead of relying on keyboard shortcuts, we can use hand gestures to control the app.
-
-Possible Gestures & Actions:
-
-👉 Thumbs-up = Start drawing mode
-
-👉 Thumbs-down = Erase mode
-
-👉 Palm Open = Clear the canvas
-
-👉 Fist = Pause drawing (freeze the screen)
-
-👉 Pinch Gesture = Adjust brush size
+### 🖐️ 2. Gesture-Based UI  
+- **Thumbs-up 👍** → Start drawing  
+- **Thumbs-down 👎** → Erase mode  
+- **Palm Open ✋** → Clear the canvas  
+- **Fist ✊** → Pause drawing  
+- **Pinch Gesture 🤏** → Adjust brush size
