@@ -46,32 +46,23 @@ class HandTracker:
 
     def get_finger_positions(self, hand_landmarks, frame_shape):
             """
-            Extracts the index and middle finger positions.
-
-            Args:
-                hand_landmarks (mediapipe.framework.formats.landmark_pb2.NormalizedLandmarkList): 
-                    Detected landmarks for a hand.
-                frame_shape (tuple): The dimensions of the frame (height, width).
-
-            Returns:
-                tuple: (index_finger_tip, middle_finger_tip) where each is (x, y) or None if not found.
+            Extracts the index and middle finger positions and returns them as a dictionary.
             """
             h, w, _ = frame_shape
-            index_finger = None
-            middle_finger = None
+            fingers = {}
 
             if hand_landmarks:
-                index_finger = (
-                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x * w),
-                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y * h)
+                fingers["index"] = (
+                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x * w),
+                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y * h)
                 )
 
-                middle_finger = (
-                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].x * w),
-                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
+                fingers["middle"] = (
+                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].x * w),
+                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
                 )
 
-            return index_finger, middle_finger  # Return both for drawing (index) and erasing (middle)
+            return fingers
 
     def draw_landmarks(self, frame, hand_landmarks):
         """
