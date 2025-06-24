@@ -6,10 +6,14 @@ Main AR Drawing App
 """
 
 import cv2
-import numpy as np
 from modules.hand_tracker import HandTracker
 from modules.drawing import DrawingCanvas
 from modules.utils import calculate_distance
+
+DRAW_THRESHOLD = 40
+ERASER_SIZE = 30
+DRAW_COLOR = (0, 255, 0)
+DRAW_THICKNESS = 5
 
 # Initialize modules
 cap = cv2.VideoCapture(1)  # Open webcam
@@ -38,12 +42,13 @@ while cap.isOpened():
                 distance = calculate_distance(index_finger, middle_finger)  # Calculate distance
 
                 # Erase if index & middle fingers are close together
-                if distance < 40:
-                    canvas.erase(index_finger, middle_finger, size=30)
+                if distance < DRAW_THRESHOLD:
+                    canvas.erase(index_finger, middle_finger, ERASER_SIZE)
+                    prev_index = None
                 else:
                     # Draw with index finger
                     if prev_index:
-                        canvas.draw_line(prev_index, index_finger, (0, 255, 0), 5)  # Green color
+                        canvas.draw_line(prev_index, index_finger, DRAW_COLOR, DRAW_THICKNESS)  # Green color
                     prev_index = index_finger
 
     frame = canvas.merge_with_frame(frame)
@@ -51,7 +56,8 @@ while cap.isOpened():
 
     key = cv2.waitKey(1) & 0xFF
     if key == ord('c'):
-        canvas.clear()  # Clear the screen
+        if canvas is not None:
+            canvas.clear()  # Clear the screen
     elif key == ord('q'):
         break  # Exit the loop
 

@@ -93,7 +93,7 @@ while cap.isOpened():
             # If the distance is small, erase instead of drawing
             if distance < 40:  # Threshold for eraser mode
                 cv2.circle(canvas, (cx, cy), 30, (0, 0, 0), -1)  # Erase with black
-                cv2.blur(canvas, (20, 20))
+                # canvas = cv2.blur(canvas, (20, 20))
             else:
                 if cy < my:  # If index finger is higher, draw with index finger (green)
                     if prev_x is not None and prev_y is not None:
