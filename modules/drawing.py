@@ -8,6 +8,7 @@ Handles all drawing operations, including:
 
 import cv2
 import numpy as np
+from utils import calculate_distance
 
 
 class DrawingCanvas:
@@ -91,3 +92,27 @@ def draw_dual_finger_lines(canvas, prev_fingers, current_fingers, color, thickne
         curr = current_fingers.get(hand)
         if prev and curr:
             canvas.draw_line(prev, curr, color, thickness)
+
+
+def handle_erase_if_close(canvas, index_tip, middle_tip, threshold, size):
+    """
+    Checks if two fingers are close enough to trigger erase,
+    and applies erasing on the canvas if they are.
+
+    Args:
+        canvas (DrawingCanvas): Your drawing surface.
+        index_tip (tuple): (x, y) of index finger.
+        middle_tip (tuple): (x, y) of middle finger.
+        threshold (float): Max distance between fingers to trigger erase.
+        size (int): Eraser size (radius).
+    
+    Returns:
+        bool: True if erase occurred, else False.
+    """
+    if index_tip and middle_tip:
+        distance = calculate_distance(index_tip, middle_tip)
+        if distance < threshold:
+            canvas.erase(index_tip, middle_tip, size)
+            return True
+    
+    return False
