@@ -39,20 +39,16 @@ class DrawingCanvas:
         """
         cv2.line(self.canvas, start, end, color, thickness)
 
-    # def draw_dual_line(start1, end1, start2, end2, color1, color2):
-
-    # def switch_color(current_color):
-
-    def erase(self, index_finger, middle_finger, size=20):
+    def erase_line(self, start, end, size=20):
         """
-        Erases part of the canvas by drawing a black line between two fingers.
+        Draws a black line (eraser effect) between two points on the canvas.
 
         Args:
-            index_finger (tuple): Position of the index finger (x, y).
-            middle_finger (tuple): Position of the middle finger (x, y).
+            start (tuple): Starting point (x, y).
+            end (tuple): Ending point (x, y).
             size (int): Thickness of the eraser.
         """
-        cv2.line(self.canvas, index_finger, middle_finger, (0, 0, 0), size)
+        cv2.line(self.canvas, start, end, (0, 0, 0), size)
     
     def merge_with_frame(self, frame):
         """
@@ -112,7 +108,11 @@ def handle_erase_if_close(canvas, index_tip, middle_tip, threshold, size):
     if index_tip and middle_tip:
         distance = calculate_distance(index_tip, middle_tip)
         if distance < threshold:
-            canvas.erase(index_tip, middle_tip, size)
+            canvas.erase_line(index_tip, middle_tip, size)
             return True
     
     return False
+
+    # def draw_dual_line(start1, end1, start2, end2, color1, color2):
+
+    # def switch_color(current_color):
