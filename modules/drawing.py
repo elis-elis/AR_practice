@@ -38,6 +38,10 @@ class DrawingCanvas:
         """
         cv2.line(self.canvas, start, end, color, thickness)
 
+    # def draw_dual_line(start1, end1, start2, end2, color1, color2):
+
+    # def switch_color(current_color):
+
     def erase(self, index_finger, middle_finger, size=20):
         """
         Erases part of the canvas by drawing a black line between two fingers.
