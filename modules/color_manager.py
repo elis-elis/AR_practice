@@ -7,7 +7,12 @@ class ColorManager:
         self.colors: A list of color values in BGR (used by OpenCV)
         self.index: Starts at 0, meaning first color (Blue) is selected.
         """
-        self.colors = [(0, 0, 255), (0, 255, 0), (255, 182, 193)] # Red, Green, Pink
+        self.colors = [
+            (0, 0, 255), # Red
+            (0, 255, 0), # Green
+            (255, 182, 193), # Pink
+            (255, 255, 0) # Yellow
+            ]
         self.index = 0
 
     def next_color(self):

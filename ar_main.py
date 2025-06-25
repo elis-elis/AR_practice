@@ -1,8 +1,8 @@
 import cv2
 from modules.hand_tracker import HandTracker
 from modules.drawing import DrawingCanvas
-from modules.utils import calculate_distance
 from modules.drawing import handle_erase_if_close
+from modules.color_manager import ColorManager
 
 
 DRAW_THRESHOLD = 40
@@ -15,6 +15,8 @@ cap = cv2.VideoCapture(1)  # Open webcam
 tracker = HandTracker()  # Hand tracking module
 canvas = None  # Drawing canvas (initialized later)
 prev_positions = {"Left": None, "Right": None}  # Store previous hand position
+color_manager = ColorManager()
+current_color = color_manager.current_color()
 
 while cap.isOpened():
     success, frame = cap.read()
@@ -33,28 +35,33 @@ while cap.isOpened():
         for hand_landmarks, hand_label in zip(results.multi_hand_landmarks, results.multi_handedness):
             hand_type = hand_label.classification[0].label # "Left" or "Right"
             fingers = tracker.get_finger_positions(hand_landmarks, frame.shape)
+            tracker.draw_landmarks(frame, hand_landmarks)
 
             index_finger = fingers.get("index")
             middle_finger = fingers.get("middle")
 
             if index_finger and middle_finger:  # Ensure both fingers are detected
                 erased = handle_erase_if_close(canvas, index_finger, middle_finger, DRAW_THRESHOLD, ERASER_SIZE)
-                # Erase if index & middle fingers are close together
                 if erased:
-                    prev_index_fingers = {}
+                    # reset drawing after an erase
+                    prev_positions[hand_type] = None
                 else:
                     prev = prev_positions[hand_type]
                     if prev:
-                        canvas.draw_line(prev, index_finger, HAND_COLORS[hand_type], DRAW_THICKNESS)
+                        canvas.draw_line(prev, index_finger, current_color, DRAW_THICKNESS)
                     prev_positions[hand_type] = index_finger
 
     frame = canvas.merge_with_frame(frame)
     cv2.imshow("AugmentedReality Drawing App", frame)
+    cv2.rectangle(frame, (10, 10), (60, 60), current_color, -1)
+    cv2.putText(frame, "Color", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
 
     key = cv2.waitKey(1) & 0xFF
     if key == ord('c'):
         if canvas is not None:
             canvas.clear()  # Clear the screen
+    elif key == ord('n'):  # 'n' for next color
+        current_color = color_manager.next_color()
     elif key == ord('q'):
         break  # Exit the loop
 
