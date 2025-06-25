@@ -70,3 +70,24 @@ class DrawingCanvas:
         Clears the canvas by setting all pixels to black.
         """
         self.canvas[:] = 0
+
+
+def draw_dual_finger_lines(canvas, prev_fingers, current_fingers, color, thickness):
+    """
+    This function is a helper function, not a method of the DrawingCanvas class. It uses the existing method draw_line() from the canvas to draw two lines:
+    one for the left hand's index finger and one for the right hand's index finger, if both are available.
+
+    It checks if each hand has a previous and current finger position, and draws a line between them on the canvas.
+
+    Args:
+        canvas (DrawingCanvas): The canvas to draw on.
+        prev_fingers (dict): Previous index finger positions. Format: {'Left': (x, y), 'Right': (x, y)}.
+        current_fingers (dict): Current index finger positions. Same format.
+        color (tuple): BGR color.
+        thickness (int): Line thickness.
+    """
+    for hand in ['Left', 'Right']:
+        prev = prev_fingers.get(hand)
+        curr = current_fingers.get(hand)
+        if prev and curr:
+            canvas.draw_line(prev, curr, color, thickness)
