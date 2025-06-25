@@ -2,6 +2,8 @@ import cv2
 from modules.hand_tracker import HandTracker
 from modules.drawing import DrawingCanvas
 from modules.utils import calculate_distance
+from modules.drawing import handle_erase_if_close
+
 
 DRAW_THRESHOLD = 40
 ERASER_SIZE = 30
@@ -32,21 +34,19 @@ while cap.isOpened():
             hand_type = hand_label.classification[0].label # "Left" or "Right"
             fingers = tracker.get_finger_positions(hand_landmarks, frame.shape)
 
-            index = fingers.get("index")
-            middle = fingers.get("middle")
+            index_finger = fingers.get("index")
+            middle_finger = fingers.get("middle")
 
-            if index and middle:  # Ensure both fingers are detected
-                distance = calculate_distance(index, middle)
-
+            if index_finger and middle_finger:  # Ensure both fingers are detected
+                erased = handle_erase_if_close(canvas, index_finger, middle_finger, DRAW_THRESHOLD, ERASER_SIZE)
                 # Erase if index & middle fingers are close together
-                if distance < DRAW_THRESHOLD:
-                    canvas.erase(index, middle, ERASER_SIZE)
-                    prev_positions[hand_type] = None
+                if erased:
+                    prev_index_fingers = {}
                 else:
                     prev = prev_positions[hand_type]
                     if prev:
-                        canvas.draw_line(prev, index, HAND_COLORS[hand_type], DRAW_THICKNESS)
-                    prev_positions[hand_type] = index
+                        canvas.draw_line(prev, index_finger, HAND_COLORS[hand_type], DRAW_THICKNESS)
+                    prev_positions[hand_type] = index_finger
 
     frame = canvas.merge_with_frame(frame)
     cv2.imshow("AugmentedReality Drawing App", frame)

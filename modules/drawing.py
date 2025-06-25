@@ -8,7 +8,7 @@ Handles all drawing operations, including:
 
 import cv2
 import numpy as np
-from utils import calculate_distance
+from modules.utils import calculate_distance
 
 
 class DrawingCanvas:
