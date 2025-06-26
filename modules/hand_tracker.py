@@ -53,13 +53,13 @@ class HandTracker:
 
             if hand_landmarks:
                 fingers["index"] = (
-                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x * w),
-                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y * h)
+                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].x * w),
+                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP].y * h)
                 )
 
                 fingers["middle"] = (
-                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].x * w),
-                    int(hand_landmarks.landmark[self.mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
+                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].x * w),
+                    int(hand_landmarks.landmark[mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP].y * h)
                 )
 
             return fingers
