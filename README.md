@@ -1,6 +1,6 @@
 # Augmented Reality Drawing App
 
-![Screenshot](modules/assets/Screenshot_ar_drawing.png)
+![Screenshot](modules/assets/Screenshot_ar-pic.png)
 
 An Augmented Reality (AR) Drawing App built with OpenCV and MediaPipe in Python.
 This project enables real-time hand tracking to draw on a virtual canvas using your index or middle finger, with eraser mode triggered when both fingers are close together.
@@ -36,6 +36,9 @@ This project enables real-time hand tracking to draw on a virtual canvas using y
 - Press 'Q' to exit the app.
 
 You’ll also see helpful on-screen cues like "erasing" or "drawing" based on your hand gestures.
+
+### Live Demo
+![AR Drawing Demo](modules/assets/ar_drawing-and-erasing.gif)
 
 ----
 
