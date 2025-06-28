@@ -7,7 +7,7 @@ This project enables real-time hand tracking to draw on a virtual canvas using y
 
 ----
 
-✨ Features :
+Features :
 
 ✔️ Real-time Webcam Capture 📷
 
